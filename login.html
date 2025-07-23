@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login / Register Form</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background: #1dbf73;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background-color: #1dbf73;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    .toggle {
+      margin-top: 1rem;
+      text-align: center;
+      cursor: pointer;
+      color: #007bff;
+      font-size: 0.9rem;
+    }
+
+    .message {
+      text-align: center;
+      margin-top: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2 id="formTitle">Login</h2>
+    <div id="form">
+      <input type="text" id="username" placeholder="Enter Username" required />
+      <input type="email" id="email" placeholder="Enter Email" style="display:none;" required />
+      <input type="password" id="password" placeholder="Enter Password" required />
+      <input type="password" id="confirmPassword" placeholder="Confirm Password" style="display:none;" required />
+      <button onclick="handleSubmit()">Login</button>
+    </div>
+    <div class="toggle" onclick="toggleForm()">Don't have an account? Register</div>
+    <div class="message" id="message"></div>
+  </div>
+
+  <script>
+    let isLogin = true;
+
+    function toggleForm() {
+      isLogin = !isLogin;
+      document.getElementById("formTitle").innerText = isLogin ? "Login" : "Register";
+      document.querySelector("button").innerText = isLogin ? "Login" : "Register";
+      document.querySelector(".toggle").innerText = isLogin
+        ? "Don't have an account? Register"
+        : "Already have an account? Login";
+      document.getElementById("message").innerText = "";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("email").value = "";
+      document.getElementById("confirmPassword").value = "";
+      document.getElementById("email").style.display = isLogin ? "none" : "block";
+      document.getElementById("confirmPassword").style.display = isLogin ? "none" : "block";
+    }
+
+    function handleSubmit() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const message = document.getElementById("message");
+      const email = document.getElementById("email").value.trim();
+      const confirmPassword = document.getElementById("confirmPassword").value.trim();
+
+      if (isLogin) {
+        if (!username || !password) {
+          message.style.color = "red";
+          message.innerText = "Please fill in all fields.";
+          return;
+        }
+        // Login logic
+        const storedUser = localStorage.getItem("user");
+        if (!storedUser) {
+          message.style.color = "red";
+          message.innerText = "No user found. Please register first.";
+          return;
+        }
+        const { username: savedUser, password: savedPass } = JSON.parse(storedUser);
+        if (username === savedUser && password === savedPass) {
+          message.style.color = "green";
+          message.innerText = "Login successful!";
+        } else {
+          message.style.color = "red";
+          message.innerText = "Invalid username or password.";
+        }
+      } else {
+        // Register logic
+        if (!username || !email || !password || !confirmPassword) {
+          message.style.color = "red";
+          message.innerText = "Please fill in all fields.";
+          return;
+        }
+        if (password !== confirmPassword) {
+          message.style.color = "red";
+          message.innerText = "Passwords do not match.";
+          return;
+        }
+        const userData = {
+          username,
+          email,
+          password,
+        };
+        localStorage.setItem("user", JSON.stringify(userData));
+        message.style.color = "green";
+        message.innerText = "Registration successful! You can now log in.";
+        toggleForm(); // Switch to login form
+      }
+    }
+  </script>
+
+</body>
+</html>
